@@ -1,0 +1,26 @@
+[versions]
+agp = "8.13.2"
+kotlin = "2.2.21"
+coreKtx = "1.17.0"
+appcompat = "1.7.1"
+material = "1.13.0"
+rikka-shizuku = "13.1.5"
+junit = "4.13.2"
+junitVersion = "1.1.5"
+espressoCore = "3.5.1"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+rikka-shizuku-api = { group = "dev.rikka.shizuku", name = "api", version.ref = "rikka-shizuku" }
+rikka-shizuku-provider = { group = "dev.rikka.shizuku", name = "provider", version.ref = "rikka-shizuku" }
+lsposed-hiddenapibypass = { group = "org.lsposed.hiddenapibypass", name = "hiddenapibypass", version = "6.1" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+
