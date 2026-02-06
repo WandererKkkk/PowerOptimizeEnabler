@@ -1,54 +1,49 @@
 package com.cyhh1029.poweroptmizeenabler
 
 import android.app.usage.IUsageStatsManager
+import android.content.pm.PackageManager
 import android.os.IDeviceIdleController
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
 
 object PowerOptimizationManager {
-    private const val PKG = "org.telegram.messenger"
+    private var isInitialized = false
+
     private const val BUCKET_WORKING_SET = 20
     private const val USER_SYSTEM = 0
 
+    private val PACKAGES = listOf(
+        "org.telegram.messenger",
+        "com.tencent.mobileqq"
+    )
+
     fun init() {
-        if (Shizuku.checkSelfPermission() == 0) {
-            run()
-        } else {
-            Shizuku.addBinderReceivedListener(object : Shizuku.OnBinderReceivedListener {
-                override fun onBinderReceived() {
-                    if (Shizuku.checkSelfPermission() == 0) {
-                        run()
-                        Shizuku.removeBinderReceivedListener(this)
-                    }
-                }
-            })
+        if (isInitialized) return
+        isInitialized = true
+
+        Shizuku.addBinderReceivedListener { exec() }
+
+        if (Shizuku.pingBinder()) {
+            exec()
         }
     }
 
-    private fun run() = Thread {
-        try {
-            // Remove from DeviceIdle whitelist
-            removeFromPowerSaveWhitelist()
+    private fun exec() {
+        if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) return
 
-            // Set app standby bucket to Working Set
-            setAppStandbyBucket()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }.start()
+        Thread {
+            val idle = IDeviceIdleController.Stub.asInterface(
+                ShizukuBinderWrapper(SystemServiceHelper.getSystemService("deviceidle"))
+            )
+            val stats = IUsageStatsManager.Stub.asInterface(
+                ShizukuBinderWrapper(SystemServiceHelper.getSystemService("usagestats"))
+            )
 
-    private fun removeFromPowerSaveWhitelist() {
-        val binder = SystemServiceHelper.getSystemService("deviceidle")
-        val wrappedBinder = ShizukuBinderWrapper(binder)
-        val deviceIdleController = IDeviceIdleController.Stub.asInterface(wrappedBinder)
-        deviceIdleController.removePowerSaveWhitelistApp(PKG)
-    }
-
-    private fun setAppStandbyBucket() {
-        val binder = SystemServiceHelper.getSystemService("usagestats")
-        val wrappedBinder = ShizukuBinderWrapper(binder)
-        val usageStatsManager = IUsageStatsManager.Stub.asInterface(wrappedBinder)
-        usageStatsManager.setAppStandbyBucket(PKG, BUCKET_WORKING_SET, USER_SYSTEM)
+            PACKAGES.forEach { pkg ->
+                idle.removePowerSaveWhitelistApp(pkg)
+                stats.setAppStandbyBucket(pkg, BUCKET_WORKING_SET, USER_SYSTEM)
+            }
+        }.start()
     }
 }

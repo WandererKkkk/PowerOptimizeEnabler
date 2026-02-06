@@ -1,13 +1,8 @@
-plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-}
+plugins { alias(libs.plugins.android.application) }
 
 android {
     namespace = "com.cyhh1029.poweroptmizeenabler"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.cyhh1029.poweroptmizeenabler"
@@ -21,7 +16,6 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            vcsInfo.include = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -34,16 +28,14 @@ android {
             excludes += "**"
         }
     }
-    lint {
-        checkReleaseBuilds = false
-    }
-    dependenciesInfo {
-        includeInApk = false
-    }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_25
+        targetCompatibility = JavaVersion.VERSION_25
     }
+}
+
+kotlin {
+    jvmToolchain(25)
 }
 
 dependencies {
