@@ -15,7 +15,10 @@ object PowerOptimizationManager {
 
     private val PACKAGES = listOf(
         "org.telegram.messenger",
-        "com.tencent.mobileqq"
+        "com.tencent.mobileqq",
+        "nu.gpu.nagram",
+        "com.google.android.gm",
+        "com.kbzbank.kpaycustomer"
     )
 
     fun init() {
